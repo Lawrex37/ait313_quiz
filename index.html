@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AIT 313 Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .quiz-container {
+      background: #020617;
+      width: 95%;
+      max-width: 600px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .question-count {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .question {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    .options button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      background: #1e293b;
+      border: none;
+      border-radius: 6px;
+      color: #e5e7eb;
+      cursor: pointer;
+      text-align: left;
+      font-size: 15px;
+    }
+    .options button:hover {
+      background: #334155;
+    }
+    .options button.correct {
+      background: #16a34a;
+    }
+    .options button.wrong {
+      background: #dc2626;
+    }
+    .next-btn, .restart-btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #2563eb;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .next-btn:hover, .restart-btn:hover {
+      background: #1d4ed8;
+    }
+    .score {
+      text-align: center;
+      font-size: 20px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-container">
+  <h1>AIT 313 Quiz</h1>
+  <div class="question-count" id="questionCount"></div>
+  <div class="question" id="question"></div>
+  <div class="options" id="options"></div>
+  <button class="next-btn" id="nextBtn" style="display:none;">Next Question</button>
+  <div class="score" id="score" style="display:none;"></div>
+  <button class="restart-btn" id="restartBtn" style="display:none;">Restart Quiz</button>
+</div>
+
+<script>
+const quizData = [
+  {q:"Who published the research paper 'Computation, Machinery and Intelligence' in 1950?", o:["John McCarthy","Alan Turing","Marvin Minsky","Herbert Simon"], a:1},
+  {q:"Where was AI research officially founded in 1956?", o:["MIT","Stanford","Dartmouth College","Oxford"], a:2},
+  {q:"What term describes the period where obtaining funding for AI projects was difficult?", o:["AI Freeze","AI Collapse","AI Winter","AI Decline"], a:2},
+  {q:"What technology revived AI research in the early 1980s?", o:["Neural Networks","Expert Systems","Robotics","Big Data"], a:1},
+  {q:"Which researchers contributed to AI foundations in 1943?", o:["Turing and Church","McCulloch and Pitts","Simon and Newell","McCarthy and Minsky"], a:1},
+
+  {q:"Which type of Machine Learning requires labeled data where the correct output is already known?", o:["Unsupervised","Reinforcement","Supervised","Deep Learning"], a:2},
+  {q:"Which learning approach involves an agent interacting with an environment and receiving rewards or penalties?", o:["Supervised","Unsupervised","Reinforcement","Semi-supervised"], a:2},
+  {q:"Spam filtering and Price prediction are examples of which type of learning?", o:["Unsupervised","Reinforcement","Supervised","Clustering"], a:2},
+  {q:"Customer segmentation belongs to?", o:["Supervised","Unsupervised","Reinforcement","Regression"], a:1},
+  {q:"What is the second step of the Machine Learning process, which involves cleaning and normalizing data?", o:["Modeling","Evaluation","Deployment","Data Pre-processing"], a:3},
+  {q:"What is the purpose of evaluating the model?", o:["To know if it understands the developer","To test it's performance on unseen data before deployment","To know the worth of the model","To test the model's performance on seen data"], a:1},
+
+  {q:"Which Neural Network is particularly effective for image recognition tasks?", o:["Recurrent Neural Network (RNN)","Artificial Neural Network (ANN)","Convolutional Neural Network (CNN)","Image Neural Network (INN)"], a:2},
+  {q:"In the context of AI gaming, what is Heuristic knowledge?", o:["Knowledge based on rigid mathematical formulas","A collection of rules of arguments based experience, common sense and intuition","The ability to see visual inputs","The processing of Natural Language"], a:1},
+  {q:"Which field of AI allows computers to process visual information like humans do?", o:["NLP","Computer Vision","Deep Learning","Robotics"], a:1},
+  {q:"Which type of ML deals with unlabeled and unclassified data?", o:["Supervised","Unsupervised","Reinforcement","Regression"], a:1},
+  {q:"Which algorithm is used to group unsorted data according to similarities and differences?", o:["Regression","Classification","Clustering","Utility"], a:2},
+
+  {q:"Simple reflex agents act based on?", o:["Future planning","World model","Current perception","Goals"], a:2},
+  {q:"Which ML algorithm is used to predict continuous numerical values?", o:["K-means","Logistic Regression","Linear Regression","KNN"], a:2},
+  {q:"In Reinforcement learning, the algorithm learns through?", o:["Labels","Clustering","Trial and error","Rules"], a:2},
+  {q:"What are the 4 key characteristics of AI agents mentioned in your notes?", o:["Fast, smart, digital, & connected","Pro-active, adaptive, goal-oriented and autonomous","Visual, Sensory, Auditory, Motor","Emotional, Thoughtful, Caring, Loving"], a:1},
+  {q:"Which specific algorithm identifies groups of data within unlabeled datasets?", o:["KNN","K-means","Linear Regression","NLP"], a:1},
+
+  {q:" According to your notes,which type of Neural Network is specifically suitable for sequential data like text or speech?", o:["Covolutional Neural Network","Artificial Neural Network","Recurrent Neural Network","Binary Neural Network"], a:2},
+  {q:"What is the specific function of Image segmentation within computer vision?", o:["Object detection","Dividing image regions","Translate text","Classify speech"], a:1},
+  {q:"Which ML algorithm is described as a predictive modeling tool used to predict the probability of future events?", o:["Linear Regression","Logistic Regression","K-means","CNN"], a:1},
+  {q:"Model-based agents works with?", o:["No memory","World model usage","Rewards","Random actions"], a:1},
+  {q:"Supervised learning is defined by?", o:["Unlabeled data","Rewards","Labeled data","Clustering"], a:2},
+
+  {q:"Which Natural Language Processing (NLP) technique involves translating text from one language to another?", o:["Text analysis","Dialogue systems","Machine translation","Sentiment analysis"], a:2},
+  {q:"How does the K-Nearest Neighbor(KNN) algorithm classify data elements?", o:["By creating decision trees","Through proximity or similarity to existing data groups","By using rewards and penalties","By using Rules"], a:1},
+  {q:"Goal-based agents focus on?", o:["Immediate action","Planning outcomes","Rewards","Classification"], a:1},
+  {q:"An intelligent agent is also called?", o:["Neural agent","Rational agent","Deep agent","Utility bot"], a:1},
+  {q:"Deep learning uses?", o:["Rules","Spreadsheets","Artificial networks","Logic only"], a:2},
+
+  {q:"Utility-based agents aim to?", o:["Be fast","Maximize utility","Follow commands","Memorize"], a:1},
+  {q:"Agents with top and low levels are?", o:["Learning Agents","Hierarchical Agents","Model-based Agents","Utility Agents"], a:1},
+  {q:"Learning agents can?", o:["Never change","Adapt over time","Only see images","Have no goals"], a:1},
+  {q:"Deep learning is called 'deep' due to?", o:["Deep philosophy concepts","Multiple layers of neural networks","Hardware","Difficulty"], a:1},
+  {q:"Semi-supervised learning uses?", o:["No data","Only labeled","Both labeled and unlabeled","Rewards"], a:2}
+];
+
+let index = 0;
+let score = 0;
+
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const nextBtn = document.getElementById("nextBtn");
+const scoreEl = document.getElementById("score");
+const restartBtn = document.getElementById("restartBtn");
+const questionCountEl = document.getElementById("questionCount");
+
+function loadQuestion() {
+  const q = quizData[index];
+  questionCountEl.textContent = `Question ${index + 1} of ${quizData.length}`;
+  questionEl.textContent = q.q;
+  optionsEl.innerHTML = "";
+  nextBtn.style.display = "none";
+
+  q.o.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(btn, i);
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(button, i) {
+  const correct = quizData[index].a;
+  [...optionsEl.children].forEach(btn => btn.disabled = true);
+  if (i === correct) {
+    button.classList.add("correct");
+    score++;
+  } else {
+    button.classList.add("wrong");
+    optionsEl.children[correct].classList.add("correct");
+  }
+  nextBtn.style.display = "block";
+}
+
+nextBtn.onclick = () => {
+  index++;
+  if (index < quizData.length) {
+    loadQuestion();
+  } else {
+    showScore();
+  }
+};
+
+function showScore() {
+  questionEl.style.display = "none";
+  optionsEl.style.display = "none";
+  questionCountEl.style.display = "none";
+  nextBtn.style.display = "none";
+  scoreEl.style.display = "block";
+  restartBtn.style.display = "block";
+  const totalQuestions = quizData.length;
+const percentage = ((score / totalQuestions) * 100).toFixed(2);
+
+scoreEl.innerHTML = `
+  You scored ${score} out of ${totalQuestions}<br>
+  <strong>${percentage}%</strong>
+`;
+}
+
+restartBtn.onclick = () => {
+  index = 0;
+  score = 0;
+  questionEl.style.display = "block";
+  optionsEl.style.display = "block";
+  questionCountEl.style.display = "block";
+  scoreEl.style.display = "none";
+  restartBtn.style.display = "none";
+  loadQuestion();
+};
+
+loadQuestion();
+</script>
+
+</body>
+</html>

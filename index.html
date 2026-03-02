@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AIT 313 Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+  /* Professional Academic Font Pairing */
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Roboto:wght@400;500&display=swap');
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    background: #F4F6FA; /* soft academic grey */
+    color: #1F2937; /* dark slate */
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .quiz-box {
+    background: #FFFFFF;
+    width: 95%;
+    max-width: 700px;
+    padding: 34px;
+    border-radius: 18px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+    border: 1px solid #E5E7EB;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 14px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: #1E3A8A; /* indigo */
+    letter-spacing: 0.6px;
+  }
+
+  .counter {
+    text-align: center;
+    font-size: 14px;
+    color: #6B7280;
+    margin-bottom: 22px;
+  }
+
+  .question {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 22px;
+    line-height: 1.7;
+    color: #111827;
+  }
+
+  .options button {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    background: #EEF2FF; /* light indigo tint */
+    border: 1px solid #D1D5DB;
+    border-radius: 14px;
+    color: #1F2937;
+    text-align: left;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.2s ease;
+  }
+
+  .options button:hover {
+    border-color: #14B8A6; /* teal accent */
+    background: #E0F2F1;
+  }
+
+  .options button.correct {
+    background: #D1FAE5; /* success mint */
+    border-color: #10B981;
+    color: #065F46;
+  }
+
+  .options button.wrong {
+    background: #FEE2E2; /* soft red */
+    border-color: #EF4444;
+    color: #7F1D1D;
+  }
+
+  .nav-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 26px;
+  }
+
+  .nav-buttons button {
+    flex: 1;
+    padding: 14px;
+    background: #1E3A8A; /* strong indigo */
+    border: none;
+    border-radius: 14px;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .nav-buttons button:hover:not(:disabled) {
+    background: #162F6B;
+  }
+
+  .nav-buttons button:disabled {
+    background: #D1D5DB;
+    color: #6B7280;
+    cursor: not-allowed;
+  }
+
+  .restart-btn {
+    margin-top: 26px;
+    width: 100%;
+    padding: 15px;
+    background: #14B8A6; /* teal */
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .restart-btn:hover {
+    background: #0F766E;
+  }
+
+  .result {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 24px;
+    font-weight: 600;
+    color: #1E3A8A;
+  }
+</style>
+
+</style>
+</head>
+<body>
+
+
+<div class="quiz-box">
+  <h1>AIT 313 Quiz</h1>
+  <div class="counter" id="counter"></div>
+
+  <div class="question" id="question"></div>
+  <div class="options" id="options"></div>
+
+  <div class="nav-buttons">
+    <button id="prevBtn">Previous</button>
+    <button id="nextBtn">Next</button>
+  </div>
+
+  <div class="result" id="result" style="display:none;"></div>
+
+<button class="restart-btn" id="restartBtn" style="display:none;">Restart Quiz</button>
+</div>
+
+<script>
+const quizData = [
+  {q:"Who published the research paper 'Computation, Machinery and Intelligence' in 1950?", o:["John McCarthy","Alan Turing","Marvin Minsky","Herbert Simon"], a:1},
+  {q:"Where was AI research officially founded in 1956?", o:["MIT","Stanford","Dartmouth College","Oxford"], a:2},
+  {q:"What term describes the period where obtaining funding for AI projects was difficult?", o:["AI Freeze","AI Collapse","AI Winter","AI Decline"], a:2},
+  {q:"What technology revived AI research in the early 1980s?", o:["Neural Networks","Expert Systems","Robotics","Big Data"], a:1},
+  {q:"Which researchers contributed to AI foundations in 1943?", o:["Turing and Church","McCulloch and Pitts","Simon and Newell","McCarthy and Minsky"], a:1},
+
+  {q:"Which type of Machine Learning requires labeled data where the correct output is already known?", o:["Unsupervised","Reinforcement","Supervised","Deep Learning"], a:2},
+  {q:"Which learning approach involves an agent interacting with an environment and receiving rewards or penalties?", o:["Supervised","Unsupervised","Reinforcement","Semi-supervised"], a:2},
+  {q:"Spam filtering and Price prediction are examples of which type of learning?", o:["Unsupervised","Reinforcement","Supervised","Clustering"], a:2},
+  {q:"Customer segmentation belongs to?", o:["Supervised","Unsupervised","Reinforcement","Regression"], a:1},
+  {q:"What is the second step of the Machine Learning process, which involves cleaning and normalizing data?", o:["Modeling","Evaluation","Deployment","Data Pre-processing"], a:3},
+  {q:"What is the purpose of evaluating the model?", o:["To know if it understands the developer","To test it's performance on unseen data before deployment","To know the worth of the model","To test the model's performance on seen data"], a:1},
+
+  {q:"Which Neural Network is particularly effective for image recognition tasks?", o:["Recurrent Neural Network (RNN)","Artificial Neural Network (ANN)","Convolutional Neural Network (CNN)","Image Neural Network (INN)"], a:2},
+  {q:"In the context of AI gaming, what is Heuristic knowledge?", o:["Knowledge based on rigid mathematical formulas","A collection of rules of arguments based experience, common sense and intuition","The ability to see visual inputs","The processing of Natural Language"], a:1},
+  {q:"Which field of AI allows computers to process visual information like humans do?", o:["NLP","Computer Vision","Deep Learning","Robotics"], a:1},
+  {q:"Which type of ML deals with unlabeled and unclassified data?", o:["Supervised","Unsupervised","Reinforcement","Regression"], a:1},
+  {q:"Which algorithm is used to group unsorted data according to similarities and differences?", o:["Regression","Classification","Clustering","Utility"], a:2},
+
+  {q:"Simple reflex agents act based on?", o:["Future planning","World model","Current perception","Goals"], a:2},
+  {q:"Which ML algorithm is used to predict continuous numerical values?", o:["K-means","Logistic Regression","Linear Regression","KNN"], a:2},
+  {q:"In Reinforcement learning, the algorithm learns through?", o:["Labels","Clustering","Trial and error","Rules"], a:2},
+  {q:"What are the 4 key characteristics of AI agents mentioned in your notes?", o:["Fast, smart, digital, & connected","Pro-active, adaptive, goal-oriented and autonomous","Visual, Sensory, Auditory, Motor","Emotional, Thoughtful, Caring, Loving"], a:1},
+  {q:"Which specific algorithm identifies groups of data within unlabeled datasets?", o:["KNN","K-means","Linear Regression","NLP"], a:1},
+
+  {q:" According to your notes,which type of Neural Network is specifically suitable for sequential data like text or speech?", o:["Covolutional Neural Network","Artificial Neural Network","Recurrent Neural Network","Binary Neural Network"], a:2},
+  {q:"What is the specific function of Image segmentation within computer vision?", o:["Object detection","Dividing image regions","Translate text","Classify speech"], a:1},
+  {q:"Which ML algorithm is described as a predictive modeling tool used to predict the probability of future events?", o:["Linear Regression","Logistic Regression","K-means","CNN"], a:1},
+  {q:"Model-based agents works with?", o:["No memory","World model usage","Rewards","Random actions"], a:1},
+  {q:"Supervised learning is defined by?", o:["Unlabeled data","Rewards","Labeled data","Clustering"], a:2},
+
+  {q:"Which Natural Language Processing (NLP) technique involves translating text from one language to another?", o:["Text analysis","Dialogue systems","Machine translation","Sentiment analysis"], a:2},
+  {q:"How does the K-Nearest Neighbor(KNN) algorithm classify data elements?", o:["By creating decision trees","Through proximity or similarity to existing data groups","By using rewards and penalties","By using Rules"], a:1},
+  {q:"Goal-based agents focus on?", o:["Immediate action","Planning outcomes","Rewards","Classification"], a:1},
+  {q:"An intelligent agent is also called?", o:["Neural agent","Rational agent","Deep agent","Utility bot"], a:1},
+  {q:"Deep learning uses?", o:["Rules","Spreadsheets","Artificial networks","Logic only"], a:2},
+
+  {q:"Utility-based agents aim to?", o:["Be fast","Maximize utility","Follow commands","Memorize"], a:1},
+  {q:"Agents with top and low levels are?", o:["Learning Agents","Hierarchical Agents","Model-based Agents","Utility Agents"], a:1},
+  {q:"Learning agents can?", o:["Never change","Adapt over time","Only see images","Have no goals"], a:1},
+  {q:"Deep learning is called 'deep' due to?", o:["Deep philosophy concepts","Multiple layers of neural networks","Hardware","Difficulty"], a:1},
+  {q:"Semi-supervised learning uses?", o:["No data","Only labeled","Both labeled and unlabeled","Rewards"], a:2},
+  
+{
+  q: "Artificial Intelligence is best defined as:",
+  o: [
+    "The study of computer hardware systems",
+    "The simulation of human intelligence processes by machines",
+    "The use of the internet to automate tasks",
+    "A branch of electrical engineering only"
+  ],
+  a: 1
+},
+{
+  q: "An intelligent agent is defined as a system that:",
+  o: [
+    "Acts randomly in an environment",
+    "Perceives its environment and takes actions to maximize goal achievement",
+    "Only processes numerical data",
+    "Operates without input"
+  ],
+  a: 1
+},
+{
+  q: "Which of the following is an example of Narrow AI?",
+  o: [
+    "A robot with human-level reasoning across all tasks",
+    "A chess-playing computer program",
+    "A self-aware machine",
+    "A system with emotional consciousness"
+  ],
+  a: 1
+},
+{
+  q: "The Turing Test was proposed to:",
+  o: [
+    "Measure computer processing speed",
+    "Determine whether a machine can exhibit intelligent behavior indistinguishable from a human",
+    "Test memory capacity",
+    "Evaluate hardware performance"
+  ],
+  a: 1
+},
+{
+  q: "In AI, the term 'environment' refers to:",
+  o: [
+    "The physical location of a computer",
+    "Everything external to the agent that it interacts with",
+    "The operating system only",
+    "The programming language used"
+  ],
+  a: 1
+},
+{
+  q: "Which of the following is NOT a characteristic of an intelligent agent?",
+  o: [
+    "Autonomy",
+    "Rationality",
+    "Learning capability",
+    "Emotional dependency"
+  ],
+  a: 3
+},
+{
+  q: "Machine Learning is a subset of AI that focuses on:",
+  o: [
+    "Designing hardware chips",
+    "Programming without algorithms",
+    "Enabling systems to learn from data",
+    "Increasing internet speed"
+  ],
+  a: 2
+},
+{
+  q: "An expert system primarily consists of:",
+  o: [
+    "A web browser and database",
+    "A knowledge base and inference engine",
+    "A robot and sensor system",
+    "A compiler and interpreter"
+  ],
+  a: 1
+},
+{
+  q: "Which search strategy explores all nodes at the present depth before moving to the next level?",
+  o: [
+    "Depth-First Search",
+    "Greedy Search",
+    "Breadth-First Search",
+    "Hill Climbing"
+  ],
+  a: 2
+},
+{
+  q: "Ethical concerns in AI include:",
+  o: [
+    "Increased electricity usage only",
+    "Bias, privacy issues, and job displacement",
+    "Faster processors",
+    "Better screen resolution"
+  ],
+  a: 1
+},
+{
+  q: "Which of the following statements best distinguishes Artificial Intelligence from conventional programming?",
+  o: [
+    "AI systems always operate without human input",
+    "AI systems can adapt or improve performance based on data",
+    "AI programs do not require algorithms",
+    "All of the above"
+  ],
+  a: 1
+},
+{
+  q: "Which of the following is NOT a core goal of Artificial Intelligence?",
+  o: [
+    "Reasoning",
+    "Learning",
+    "Perception",
+    "Increasing internet bandwidth"
+  ],
+  a: 3
+},
+{
+  q: "A system that maps inputs to outputs based on experience is demonstrating:",
+  o: [
+    "Traditional deterministic programming",
+    "Machine learning",
+    "Manual computation",
+    "None of the above"
+  ],
+  a: 1
+},
+{
+  q: "Which of the following are forms of machine learning?",
+  o: [
+    "Supervised learning",
+    "Unsupervised learning",
+    "Reinforcement learning",
+    "All of the above"
+  ],
+  a: 3
+},
+{
+  q: "In supervised learning, the term 'label' refers to:",
+  o: [
+    "The programming language used",
+    "The correct output associated with training data",
+    "The system’s memory allocation",
+    "None of the above"
+  ],
+  a: 1
+},
+{
+  q: "Which of the following algorithms is typically used for classification tasks?",
+  o: [
+    "Linear Regression",
+    "Decision Tree",
+    "K-Means Clustering",
+    "None of the above"
+  ],
+  a: 1
+},
+{
+  q: "An AI agent is considered rational if it:",
+  o: [
+    "Acts randomly in complex environments",
+    "Maximizes its performance measure based on available percepts",
+    "Copies human emotions",
+    "Requires constant supervision"
+  ],
+  a: 1
+},
+{
+  q: "Which of the following components are essential to an AI agent?",
+  o: [
+    "Sensors",
+    "Actuators",
+    "Environment interaction",
+    "All of the above"
+  ],
+  a: 3
+},
+{
+  q: "Deep learning differs from traditional machine learning primarily because it:",
+  o: [
+    "Does not use data",
+    "Uses multi-layered neural networks to model complex patterns",
+    "Eliminates the need for algorithms",
+    "Operates only on small datasets"
+  ],
+  a: 1
+},
+{
+  q: "Which of the following statements about deep learning is correct?",
+  o: [
+    "It automatically extracts hierarchical features from data",
+    "It always outperforms all other algorithms",
+    "It does not require training",
+    "None of the above"
+  ],
+  a: 0
+},
+{
+  q: "Reinforcement learning is best described as learning through:",
+  o: [
+    "Explicitly labeled examples only",
+    "Trial and error using rewards and penalties",
+    "Clustering unlabeled data",
+    "None of the above"
+  ],
+  a: 1
+},
+{
+  q: "Which of the following is NOT a machine learning algorithm?",
+  o: [
+    "K-Nearest Neighbors",
+    "Decision Tree",
+    "Breadth-First Search",
+    "Support Vector Machine"
+  ],
+  a: 2
+},
+{
+  q: "A reactive AI agent differs from a learning agent because it:",
+  o: [
+    "Has memory of past experiences",
+    "Improves performance over time",
+    "Responds only to current percepts without internal state",
+    "Uses deep neural networks"
+  ],
+  a: 2
+},
+{
+  q: "Which of the following scenarios best represents unsupervised learning?",
+  o: [
+    "Predicting house prices using labeled training data",
+    "Grouping customers based on purchasing behavior without predefined labels",
+    "Training a robot using reward signals",
+    "None of the above"
+  ],
+  a: 1
+},
+{
+  q: "Artificial Intelligence can be classified into Narrow AI and General AI. Which statement is true?",
+  o: [
+    "General AI currently dominates industrial applications",
+    "Narrow AI performs specific tasks efficiently",
+    "Narrow AI has human-level consciousness",
+    "All of the above"
+  ],
+  a: 1
+},
+{
+  q: "Which of the following best explains why AI systems require large datasets?",
+  o: [
+    "To increase computer processing speed",
+    "To enable the system to identify patterns and generalize",
+    "To eliminate the need for algorithms",
+    "None of the above"
+  ],
+  a: 1
+},
+{
+  q: "A performance measure in an AI agent is used to:",
+  o: [
+    "Define the internal hardware capacity",
+    "Evaluate the success of the agent’s actions",
+    "Store training data",
+    "All of the above"
+  ],
+  a: 1
+},
+{
+  q: "Which statement about General AI is correct?",
+  o: [
+    "It currently performs specific tasks only",
+    "It possesses human-level intelligence across tasks",
+    "It is widely deployed in industry",
+    "None of the above"
+  ],
+  a: 1
+},
+{
+  q: "Overfitting in machine learning occurs when a model:",
+  o: [
+    "Performs well on training data but poorly on unseen data",
+    "Cannot learn from training data",
+    "Uses too little data",
+    "All of the above"
+  ],
+  a: 0
+},
+{
+  q: "Which of the following is a regression algorithm?",
+  o: [
+    "Logistic Regression",
+    "Linear Regression",
+    "K-Means",
+    "Both A and B"
+  ],
+  a: 3
+},
+{
+  q: "In unsupervised learning, the system primarily attempts to:",
+  o: [
+    "Predict labeled outcomes",
+    "Discover hidden patterns in unlabeled data",
+    "Maximize reward signals",
+    "None of the above"
+  ],
+  a: 1
+},
+{
+  q: "A learning agent differs from a simple reflex agent because it:",
+  o: [
+    "Has no interaction with environment",
+    "Can improve its performance over time",
+    "Does not require sensors",
+    "Is always supervised by humans"
+  ],
+  a: 1
+},
+{
+  q: "Which of the following statements about neural networks is true?",
+  o: [
+    "They are inspired by the human brain structure",
+    "They consist of interconnected layers of nodes",
+    "They can approximate complex functions",
+    "All of the above"
+  ],
+  a: 3
+},
+{
+  q: "The primary goal of clustering algorithms is to:",
+  o: [
+    "Assign predefined labels to data",
+    "Group similar data points together",
+    "Maximize classification accuracy",
+    "None of the above"
+  ],
+  a: 1
+},
+{
+  q: "Which of the following is NOT a characteristic of machine learning?",
+  o: [
+    "Data-driven improvement",
+    "Automatic pattern recognition",
+    "Explicit hard-coded rules only",
+    "Model generalization"
+  ],
+  a: 2
+},
+{
+  q: "A deterministic environment in AI is one where:",
+  o: [
+    "The outcome of an action is fully predictable",
+    "The agent cannot observe changes",
+    "Rewards are random",
+    "None of the above"
+  ],
+  a: 0
+},
+{
+  q: "Which of the following best describes reinforcement learning?",
+  o: [
+    "Learning from labeled examples",
+    "Learning by interacting with environment using rewards",
+    "Learning by clustering data",
+    "All of the above"
+  ],
+  a: 1
+},
+{
+  q: "Deep learning models are particularly effective for:",
+  o: [
+    "Simple arithmetic operations only",
+    "High-dimensional and unstructured data",
+    "Small rule-based systems",
+    "None of the above"
+  ],
+  a: 1
+},
+{
+  q: "Bias in machine learning models can result from:",
+  o: [
+    "Imbalanced training data",
+    "Poor feature selection",
+    "Human design decisions",
+    "All of the above"
+  ],
+  a: 3
+},
+{
+  q: "Which of the following best differentiates classification from regression?",
+  o: [
+    "Classification predicts continuous values while regression predicts categories",
+    "Regression predicts continuous values while classification predicts categories",
+    "Both predict only discrete values",
+    "None of the above"
+  ],
+  a: 1
+}
+];
+
+let current = 0;
+let score = 0;
+
+// ✅ Pick 60 random questions WITHOUT modifying quizData
+function pickRandomQuestions(bank, count) {
+  const copy = [...bank];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, count);
+}
+
+const examData = pickRandomQuestions(quizData, 60);
+
+let answers = new Array(examData.length).fill(null);
+let shuffledOptions = new Array(examData.length).fill(null);
+
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+const counterEl = document.getElementById("counter");
+const resultEl = document.getElementById("result");
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function loadQuestion() {
+  const q = examData[current];
+
+  counterEl.textContent = `Question ${current + 1} of ${examData.length}`;
+  questionEl.innerHTML = q.q;
+  optionsEl.innerHTML = "";
+
+  prevBtn.disabled = current === 0;
+
+  let optionsToRender;
+
+  if (shuffledOptions[current] === null) {
+    optionsToRender = q.o.map((text, index) => ({
+      text,
+      originalIndex: index
+    }));
+
+    shuffleArray(optionsToRender);
+    shuffledOptions[current] = optionsToRender;
+  } else {
+    optionsToRender = shuffledOptions[current];
+  }
+
+  optionsToRender.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.textContent = opt.text;
+
+    if (answers[current] !== null) {
+      btn.disabled = true;
+
+      if (opt.originalIndex === q.a) {
+        btn.classList.add("correct");
+      }
+
+      if (
+        opt.originalIndex === answers[current] &&
+        answers[current] !== q.a
+      ) {
+        btn.classList.add("wrong");
+      }
+    }
+
+    btn.onclick = () => selectAnswer(opt.originalIndex);
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(index) {
+  if (answers[current] !== null) return;
+
+  answers[current] = index;
+  if (index === examData[current].a) score++;
+
+  loadQuestion();
+}
+
+nextBtn.onclick = () => {
+  if (current < examData.length - 1) {
+    current++;
+    loadQuestion();
+  } else {
+    showResult();
+  }
+};
+
+prevBtn.onclick = () => {
+  if (current > 0) {
+    current--;
+    loadQuestion();
+  }
+};
+
+function showResult() {
+  questionEl.style.display = "none";
+  optionsEl.style.display = "none";
+  counterEl.style.display = "none";
+  document.querySelector(".nav-buttons").style.display = "none";
+
+  const percentage = ((score / examData.length) * 100).toFixed(2);
+  resultEl.style.display = "block";
+  restartBtn.style.display ="block";
+
+  resultEl.innerHTML = `
+    <p><strong>Quiz Completed</strong></p>
+    <p>Score: ${score} / ${examData.length}</p>
+    <p>Percentage: ${percentage}%</p>
+  `;
+}
+
+restartBtn.onclick = () => {
+  current = 0;
+  score = 0;
+
+  const newExamData = pickRandomQuestions(quizData, 60);
+  examData.length = 0;
+  examData.push(...newExamData);
+
+  answers = new Array(examData.length).fill(null);
+  shuffledOptions = new Array(examData.length).fill(null);
+
+  questionEl.style.display = "block";
+  optionsEl.style.display = "block";
+  counterEl.style.display = "block";
+  document.querySelector(".nav-buttons").style.display = "flex";
+  resultEl.style.display = "none";
+  restartBtn.style.display = "none";
+
+  prevBtn.disabled = true;
+  nextBtn.disabled = false;
+
+  loadQuestion();
+};
+
+loadQuestion();
+</script>
+
+</body>
+</html>
